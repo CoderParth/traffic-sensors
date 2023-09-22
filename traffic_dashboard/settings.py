@@ -7,8 +7,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = config('DEBUG', default=False, cast=bool)
 SECRET_KEY = config('SECRET_KEY')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [config('ALLOWED_HOSTS')]
 
+# Ensure the session cookie is sent only over HTTPS:
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE')
+
+# Ensure the CSRF cookie is sent only over HTTPS:
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE')
 
 # Application definition
 INSTALLED_APPS = [
@@ -96,7 +101,6 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
