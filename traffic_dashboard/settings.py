@@ -96,7 +96,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-ALLOWED_HOSTS = [config('ALLOWED_HOSTS')]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
