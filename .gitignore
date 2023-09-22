@@ -1,0 +1,21 @@
+# .gitignore
+
+__pycache__/
+*.py[cod]
+db.sqlite3
+.Python
+db.sqlite3-journal
+*.swp
+*.swo
+*.swn
+*.DS_Store
+*.egg-info
+.PYTHON_HISTORY
+.env
+*.sublime-project
+*.sublime-workspace
+*.vscode/
+*.idea/
+venv/
+venv
+.vscode
