@@ -25,8 +25,15 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "backend",
+    "seeders",
     "frontend",
+    "channels"
 ]
+
+
+# Use channels for routing
+ASGI_APPLICATION = 'traffic_dashboard.asgi.application'
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -104,10 +111,6 @@ STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
-# Celery -- JOB SETUP
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sensor Data</title>
+  </head>
+  <body>
+    <h1>Hello WORLD!!!</h1>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Enter a message" />
+    <button id="sendButton">Send</button>
+
+    <script>
+      const socket = new WebSocket("ws://localhost:8000/ws");
+
+      // Connection opened
+      socket.addEventListener("open", (event) => {
+        console.log("WebSocket connected!");
+      });
+
+      // Listen for messages
+      socket.addEventListener("message", (event) => {
+        const messagesDiv = document.getElementById("messages");
+        const message = document.createElement("p");
+        message.textContent = event.data;
+        console.log("got the message boy ", message.textContent);
+        messagesDiv.appendChild(message);
+      });
+
+      // Connection closed
+      socket.addEventListener("close", (event) => {
+        console.log("WebSocket closed:", event);
+      });
+
+      // Send a message when the "Send" button is clicked
+      const sendButton = document.getElementById("sendButton");
+      const messageInput = document.getElementById("messageInput");
+      sendButton.addEventListener("click", () => {
+        const message = messageInput.value;
+        socket.send(message);
+        messageInput.value = "";
+      });
+    </script>
+  </body>
+</html>
