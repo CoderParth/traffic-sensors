@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     "seeders",
     "frontend",
     "channels",
-    "django_extensions",
 ]
 
 MIDDLEWARE = [
