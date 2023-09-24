@@ -1,47 +1,4 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sensor Data</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  </head>
-  <body>
-    <div id="map" style="width: 100%; height: 500px"></div>
-    <div id="messages"></div>
-
-    <script>
-      const map = L.map("map").setView([0, 0], 2); // Set initial map view
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
-        map
-      );
-
-      const socket = new WebSocket("{{ ws_url }}");
-
-      socket.addEventListener("open", (event) => {
-        console.log("WebSocket connected!");
-      });
-
-      socket.addEventListener("message", (event) => {
-        const sensorData = JSON.parse(event.data);
-        console.log("sensor data", sensorData);
-        for (const dataItem of sensorData.data) {
-          const lat = dataItem.latitude;
-          const lon = dataItem.longitude;
-          const speed = dataItem.vehicle_speed;
-          const speedLimit = dataItem.speed_limit;
-          const marker = L.marker([lat, lon]).addTo(map);
-          marker.bindPopup(`Vehicle Speed: ${speed} km/h`).openPopup();
-        }
-      });
-
-      socket.addEventListener("close", (event) => {
-        console.log("WebSocket closed:", event);
-      });
-    </script>
-  </body>
-</html> -->
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -51,149 +8,174 @@
     <title>Sensor Data</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
   </head>
   <body>
-    <div id="map" style="width: 100%; height: 500px"></div>
-    <div id="messages"></div>
+    <div class="container mt-4">
+      <div class="row">
+        <div class="col-md-6">
+          <div id="map" style="width: 100%; height: 500px"></div>
+        </div>
+        <div class="col-md-6">
+          <div id="chart-container">
+            <canvas id="bar-chart" class="mb-4"></canvas>
+            <canvas id="line-chart" class="mb-4"></canvas>
+          </div>
+        </div>
+      </div>
 
-    <div id="query-form">
-      <label>
-        Location:
-        <input type="text" id="location" placeholder="lat,lon" />
-      </label>
-      <label>
-        Min Speed:
-        <input type="range" id="min-speed" min="0" max="150" value="0" />
-      </label>
-      <label>
-        Max Speed:
-        <input type="range" id="max-speed" min="0" max="150" value="200" />
-      </label>
-      <label>
-        Min Speed Limit:
-        <input type="range" id="min-speed-limit" min="0" max="150" value="0" />
-      </label>
-      <label>
-        Max Speed Limit:
-        <input
-          type="range"
-          id="max-speed-limit"
-          min="0"
-          max="150"
-          value="200"
-        />
-      </label>
-      <label>
-        Start Date:
-        <input type="date" id="start-date" />
-      </label>
-      <label>
-        End Date:
-        <input type="date" id="end-date" />
-      </label>
-      <button onclick="sendQuery()">Send Query</button>
+      <div class="row mt-4">
+        <div class="col-md-12">
+          <form id="query-form">
+            <!-- Row for Location Input -->
+            <div class="form-row mb-3">
+              <div class="col">
+                <label for="location">Location</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="location"
+                  placeholder="lat,lon"
+                />
+              </div>
+            </div>
+
+            <!-- Row for Speed Ranges -->
+            <div class="form-row mb-3">
+              <div class="col">
+                <label for="min-speed"
+                  >Min Speed: <span id="min-speed-val">0</span></label
+                >
+                <input
+                  type="range"
+                  class="custom-range"
+                  id="min-speed"
+                  min="0"
+                  max="150"
+                  value="0"
+                  oninput="updateValue('min-speed', 'min-speed-val')"
+                />
+              </div>
+              <div class="col">
+                <label for="max-speed"
+                  >Max Speed: <span id="max-speed-val">200</span></label
+                >
+                <input
+                  type="range"
+                  class="custom-range"
+                  id="max-speed"
+                  min="0"
+                  max="200"
+                  value="200"
+                  oninput="updateValue('max-speed', 'max-speed-val')"
+                />
+              </div>
+            </div>
+
+            <!-- Row for Speed Limit Ranges -->
+            <div class="form-row mb-3">
+              <div class="col">
+                <label for="min-speed-limit"
+                  >Min Speed Limit:
+                  <span id="min-speed-limit-val">0</span></label
+                >
+                <input
+                  type="range"
+                  class="custom-range"
+                  id="min-speed-limit"
+                  min="0"
+                  max="150"
+                  value="0"
+                  oninput="updateValue('min-speed-limit', 'min-speed-limit-val')"
+                />
+              </div>
+              <div class="col">
+                <label for="max-speed-limit"
+                  >Max Speed Limit:
+                  <span id="max-speed-limit-val">200</span></label
+                >
+                <input
+                  type="range"
+                  class="custom-range"
+                  id="max-speed-limit"
+                  min="0"
+                  max="150"
+                  value="150"
+                  oninput="updateValue('max-speed-limit', 'max-speed-limit-val')"
+                />
+              </div>
+            </div>
+
+            <!-- Row for Date Pickers -->
+            <div class="form-row mb-3">
+              <div class="col">
+                <label for="start-date">Start Date</label>
+                <input type="date" class="form-control" id="start-date" />
+              </div>
+              <div class="col">
+                <label for="end-date">End Date</label>
+                <input type="date" class="form-control" id="end-date" />
+              </div>
+            </div>
+
+            <!-- Row for Submit Button -->
+            <div class="form-row">
+              <div class="col">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  id="search-button"
+                  onclick="sendQuery()"
+                >
+                  Search
+                  <div
+                    class="spinner-border spinner-border-sm text-light"
+                    id="spinner"
+                    role="status"
+                    hidden
+                  >
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
-    <script>
-      const map = L.map("map").setView([0, 0], 2); // Set initial map view
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
-        map
-      );
+    <script type="text/javascript">
+      //  Render Django context data into JavaScript variables
+      const ws_url = "{{ ws_url }}";
+      const icon_url = "{{ icon_url }}";
 
-      // Custom icon
-      const carIcon = L.icon({
-        iconUrl:
-          "data:image/png;base64,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",
-        iconSize: [32, 32], // size of the icon
-        iconAnchor: [16, 32], // point of the icon which will correspond to marker's location
-        popupAnchor: [0, -32], // point from which the popup should open relative to the iconAnchor
-      });
-
-      const socket = new WebSocket("{{ ws_url }}");
-
-      socket.addEventListener("open", (event) => {
-        console.log("WebSocket connected!");
-      });
-
-      let currentQuery = {}; // Object to hold the current query parameters
-
-      function sendQuery() {
-        const query = {
-          location: document.getElementById("location").value,
-          min_speed: document.getElementById("min-speed").value,
-          max_speed: document.getElementById("max-speed").value,
-          min_speed_limit: document.getElementById("min-speed-limit").value,
-          max_speed_limit: document.getElementById("max-speed-limit").value,
-          start_date: document.getElementById("start-date").value,
-          end_date: document.getElementById("end-date").value,
-        };
-
-        console.log("query ", query);
-        currentQuery = query; // Update the current query object
+      function updateValue(inputId, outputId) {
+        document.getElementById(outputId).textContent =
+          document.getElementById(inputId).value;
       }
 
-      socket.addEventListener("message", (event) => {
-        const sensorData = JSON.parse(event.data);
-        console.log("sensor data", sensorData);
+      // Spinner
+      let isLoading = false;
 
-        // Filter the data based on the current query parameters
-        const filteredData = sensorData.data.filter((dataItem) => {
-          const speed = parseFloat(dataItem.vehicle_speed);
-          const speedLimit = parseFloat(dataItem.speed_limit);
-          const lat = parseFloat(dataItem.latitude);
-          const lon = parseFloat(dataItem.longitude);
-
-          // Split location only if it's defined and not empty
-          const [queryLat, queryLon] = currentQuery.location
-            ? currentQuery.location.split(",").map(Number)
-            : [null, null];
-
-          const date = new Date(dataItem.timestamp);
-          const startDate = new Date(currentQuery.start_date);
-          const endDate = new Date(currentQuery.end_date);
-
-          return (
-            (!currentQuery.location ||
-              (lat === queryLat && lon === queryLon)) &&
-            (!currentQuery.min_speed ||
-              speed >= parseFloat(currentQuery.min_speed)) &&
-            (!currentQuery.max_speed ||
-              speed <= parseFloat(currentQuery.max_speed)) &&
-            (!currentQuery.min_speed_limit ||
-              speedLimit >= parseFloat(currentQuery.min_speed_limit)) &&
-            (!currentQuery.max_speed_limit ||
-              speedLimit <= parseFloat(currentQuery.max_speed_limit)) &&
-            (!currentQuery.start_date || date >= startDate) &&
-            (!currentQuery.end_date || date <= endDate)
-          );
-        });
-
-        // Clear previous markers
-        map.eachLayer((layer) => {
-          if (layer instanceof L.Marker) {
-            map.removeLayer(layer);
-          }
-        });
-
-        // Display the filtered data on the map
-        for (const dataItem of filteredData) {
-          const lat = parseFloat(dataItem.latitude);
-          const lon = parseFloat(dataItem.longitude);
-          const speed = dataItem.vehicle_speed;
-          const speedLimit = dataItem.speed_limit;
-          // const marker = L.marker([lat, lon]).addTo(map);
-          const marker = L.marker([lat, lon], { icon: carIcon }).addTo(map);
-          marker
-            .bindPopup(
-              `Vehicle Speed: ${speed} km/h <br> Speed Limit: ${speedLimit} km/h`
-            )
-            .openPopup();
-        }
-      });
-
-      socket.addEventListener("close", (event) => {
-        console.log("WebSocket closed:", event);
-      });
+      function setLoading(loading) {
+        isLoading = loading;
+        document.getElementById("spinner").hidden = !loading;
+      }
     </script>
+
+    <!-- Include  separate JavaScript files -->
+    <script src="{% static 'js/map.js' %}"></script>
+    <script src="{% static 'js/charts.js' %}"></script>
+    <script src="{% static 'js/socket.js' %}"></script>
   </body>
 </html>

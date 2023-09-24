@@ -103,15 +103,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
-
+STATICFILES_DIRS = [BASE_DIR / "static"]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 
 # Use channels for routing
 ASGI_APPLICATION = 'traffic_dashboard.asgi.application'
-# Use channels for routing
-# ASGI_APPLICATION = 'backend.routing.application'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 django_heroku.settings(locals())

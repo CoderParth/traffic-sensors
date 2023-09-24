@@ -9,7 +9,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         if not TrafficSensorData.objects.exists():
-            for i in range(10):  # Creates 10 sensor data points
+            for i in range(10):  # Create 10 sensor data points
                 lat = uniform(-44.0, -10.0)
                 lon = uniform(113.0, 154.0)
                 timestamp = datetime.now() - timedelta(minutes=randrange(60))
