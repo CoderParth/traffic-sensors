@@ -23,11 +23,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "channels",
     "rest_framework",
     "backend",
     "seeders",
     "frontend",
-    "channels",
 ]
 
 MIDDLEWARE = [
@@ -59,8 +59,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "traffic_dashboard.wsgi.application"
-# Use channels for routing
-ASGI_APPLICATION = 'traffic_dashboard.asgi.application'
 
 DATABASES = {
     'default': {
@@ -109,6 +107,11 @@ STATIC_URL = "static/"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
+
+# Use channels for routing
+ASGI_APPLICATION = 'traffic_dashboard.asgi.application'
+# Use channels for routing
+# ASGI_APPLICATION = 'backend.routing.application'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 django_heroku.settings(locals())

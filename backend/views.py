@@ -13,6 +13,7 @@ from django.utils.timezone import make_aware
 
 class TrafficSensorDataViewSet(viewsets.ModelViewSet):
     serializer_class = TrafficSensorDataSerializer
+    format_kwarg = 'format'
 
     def handle_exception(self, exc):
         if isinstance(exc, (ParseError, ValidationError, APIException)):

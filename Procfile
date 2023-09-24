@@ -1,2 +1,2 @@
 release: python manage.py migrate --noinput
-web: gunicorn traffic_dashboard.wsgi --log-file -
+web: daphne traffic_dashboard.asgi:application
