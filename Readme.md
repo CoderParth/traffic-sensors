@@ -16,7 +16,7 @@ Deployed to Heroku. See live at: [https://traffic-sensors-6fa380496f26.herokuapp
 
 - **Real-Time Data Emulation**:
 
-  - Mock sensor data emulator simulating real-time data transmission, updating every 5 seconds.
+  - Mock sensor data emulator simulating real-time data transmission.
 
 - **Interactive Frontend using Chart.js**:
 
@@ -52,10 +52,8 @@ $ cd traffic-sensors
 
 ### 2. Install Python and create a virtual env
 
-python -m venv venv
-
 ```bash
-$ py -m venv myworld
+$ python -m venv venv
 ```
 
 ### 3. Activate the virtual Environment
