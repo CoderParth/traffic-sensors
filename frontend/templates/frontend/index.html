@@ -4,42 +4,40 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sensor Data</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   </head>
   <body>
-    <h1>Hello WORLD!!!</h1>
+    <div id="map" style="width: 100%; height: 500px"></div>
     <div id="messages"></div>
-    <input type="text" id="messageInput" placeholder="Enter a message" />
-    <button id="sendButton">Send</button>
 
     <script>
-      const socket = new WebSocket("ws://localhost:8000/ws");
+      const map = L.map("map").setView([0, 0], 2); // Set initial map view
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
+        map
+      );
 
-      // Connection opened
+      const socket = new WebSocket("{{ ws_url }}");
+
       socket.addEventListener("open", (event) => {
         console.log("WebSocket connected!");
       });
 
-      // Listen for messages
       socket.addEventListener("message", (event) => {
-        const messagesDiv = document.getElementById("messages");
-        const message = document.createElement("p");
-        message.textContent = event.data;
-        console.log("got the message boy ", message.textContent);
-        messagesDiv.appendChild(message);
+        console.log("message ", event.data);
+        const sensorData = JSON.parse(event.data);
+        for (const dataItem of sensorData) {
+          const lat = dataItem.fields.latitude;
+          const lon = dataItem.fields.longitude;
+          const speed = dataItem.fields.vehicle_speed;
+          const marker = L.marker([lat, lon]).addTo(map);
+          marker.bindPopup(`Vehicle Speed: ${speed} km/h`).openPopup();
+        }
+        console.log(sensorData);
       });
 
-      // Connection closed
       socket.addEventListener("close", (event) => {
         console.log("WebSocket closed:", event);
-      });
-
-      // Send a message when the "Send" button is clicked
-      const sendButton = document.getElementById("sendButton");
-      const messageInput = document.getElementById("messageInput");
-      sendButton.addEventListener("click", () => {
-        const message = messageInput.value;
-        socket.send(message);
-        messageInput.value = "";
       });
     </script>
   </body>

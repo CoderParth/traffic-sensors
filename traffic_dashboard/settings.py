@@ -27,13 +27,9 @@ INSTALLED_APPS = [
     "backend",
     "seeders",
     "frontend",
-    "channels"
+    "channels",
+    "django_extensions",
 ]
-
-
-# Use channels for routing
-ASGI_APPLICATION = 'traffic_dashboard.asgi.application'
-
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -64,6 +60,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "traffic_dashboard.wsgi.application"
+# Use channels for routing
+ASGI_APPLICATION = 'traffic_dashboard.asgi.application'
 
 DATABASES = {
     'default': {
